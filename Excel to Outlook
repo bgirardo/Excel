@@ -1,0 +1,164 @@
+Public Sub Mailer()
+ Dim myOlObject As New Outlook.Application
+ Dim myOlApp As Object
+ Dim myItem As Outlook.MailItem
+ Dim sSiteName As String
+ Dim sFord_Friendly_Name As String
+ Dim sCDSID As String
+ Dim sSubject As String
+ Dim sMailBody As String
+ Dim iCDS_Column As Integer
+ Dim iSite_Column As Integer
+ Dim iCurrent_Row As Integer
+ Dim sSite_Name As String
+ Dim objMail As Object
+ Dim myRecipient As Object
+ Dim Text_Message As String
+ Dim This_Result As Integer
+ Text_Message = "Use this macro to send provisioning eMails to non ADS customers." & vbCr & vbCr
+ Text_Message = Text_Message & "Format:  CDSID of the Target Customer"
+ This_Result = MsgBox(Text_Message, vbOKCancel)
+ If (This_Result = 2) Then
+     End
+ End If
+ 
+ iCDS_Column = 1
+ iCurrent_Row = 2
+ 
+ sCDSID = Worksheets(1).Cells(iCurrent_Row, iCDS_Column).Value
+ While (sCDSID <> "")
+     sSite_Name = "http://www.tc.ford.com/pps/" & sCDSID
+     sFord_Friendly_Name = Ford_Friendly_name(sCDSID)
+     sSubject = "Notification that a TeamConnect Personal Productivity Site has been created for " & sFord_Friendly_Name & "."
+    
+     sMailBody = "<HTML><BODY><H2><B><U>Attention:</U></B></H2><P><P>A TeamConnect Personal Productivity site for <b>"
+     sMailBody = sMailBody & sFord_Friendly_Name & "</B> has been created. "
+     sMailBody = sMailBody & "To access it, please click on the following link and then add it to your browser 's ""favorites"" "
+     sMailBody = sMailBody & "<a href=" & sSite_Name & ">  " & sFord_Friendly_Name & "'s Site</a> (" & sSite_Name & ").  <P><P>"
+    
+     sMailBody = sMailBody & "For more information on TeamConnect or other Collaborative offerings, please refer to "
+     sMailBody = sMailBody & "http://www.tc.ford.com, the <A href=http://www.tc.ford.com/>TeamConnect Site</A>. "
+     sMailBody = sMailBody & "FAQs and Known issues can be found athttp://www.tc.ford.com/pages/PersonalProductivitySites_1.aspx "
+     sMailBody = sMailBody & "<A href=http://www.tc.ford.com/pages/PersonalProductivitySites_1.aspx>Team Connect FAQs</A>. For training "
+     sMailBody = sMailBody & "resources please refer tohttp://www.tc.ford.com/pages/education.aspx <A href=http://www.tc.ford.com/pages/education.aspx>TeamConnect</a> "
+   
+     'sMailBody = sMailBody & "For more information on TeamConnect or other Collaborative offerings, please refer to the "
+     'sMailBody = sMailBody & "http://www.tc.ford.com, the <a href=http://www.tc.ford.com>TeamConnect Site</a>.  FAQs and Known issues can be found at "
+     'sMailBody = sMailBody & "http://www.tc.ford.com/pages/PersonalProductivitySites_1.aspx <a href =http://www.tc.ford.com/pages/PersonalProductivitySites_1.aspx > Team Connect FAQs</A>."
+     'sMailBody = sMailBody & "  For training resources please refer tohttp://www.tc.ford.com/pages/education.aspx <a href=http://www.tc.ford.com/pages/education.aspx>TeamConnect Training "
+     'sMailBody = sMailBody & "Resources</A>."
+    
+     sMailBody = sMailBody & "<P><P><BR><BR><H2><B><U>Overview:</U></B></H2><P><P> "
+     sMailBody = sMailBody & "<H2><B>What is a TeamConnect Personal Productivity Site?</B></H2> "
+     sMailBody = sMailBody & "<P>TeamConnect Personal Productivity Sites (PPS) are a simple and powerful way "
+     sMailBody = sMailBody & "for employees to collaborate with their peers to get their work done "
+     sMailBody = sMailBody & "efficiently. A TeamConnect PPS is a virtual workspace on the Web that sets up in minutes, allowing employees to begin "
+     sMailBody = sMailBody & "efficiently collaborating with their peers instantly.  "
+     sMailBody = sMailBody & "Included with your PPS, at no additional charge, are Data Conferencing "
+     sMailBody = sMailBody & "and Instant Messaging (which requires a seperate client load - see below).<P>  "
+     sMailBody = sMailBody & "<H2><B>What can a TeamConnect Personal Productivity Site do for You?</B></H2> "
+     sMailBody = sMailBody & "<P>The following are some examples of what a PPS can do for you.  "
+     sMailBody = sMailBody & "<P><B>Co-authoring of Documents</B>"
+     sMailBody = sMailBody & "<P>Invite peers to your PPS to actively work on a document - solicit comments, "
+     sMailBody = sMailBody & "mark-ups, corrections, new ideas all on one central location. This is much "
+     sMailBody = sMailBody & "better than a string of Emails that usually jams your inbox and are difficult to "
+     sMailBody = sMailBody & "cipher through.<P><B>Sharing Documents</B><P>Use your PPS to store documents that "
+     sMailBody = sMailBody & "are not necessarily related to a team project, but you want to share with others.  "
+     sMailBody = sMailBody & "Invite your peers to your PPS to view these documents instead of sending them out "
+     sMailBody = sMailBody & "via Email. This avoids cluttering your peers' inbox with attached files "
+     sMailBody = sMailBody & "and also ensures that your peers are always looking at the latest and "
+     sMailBody = sMailBody & "greatest version.<P><B>Manage Small and Short Projects</B> "
+     sMailBody = sMailBody & "<P>Your PPS can be used to manage a small project that is short in duration and "
+     sMailBody = sMailBody & "wouldn 't really merit its own team site (e.g. a small Green Belt project).  In "
+     sMailBody = sMailBody & "this case, your PPS can be used as a central location where team members can "
+     sMailBody = sMailBody & "actively post and edit their work, reference it, manage deliverables, and track "
+     sMailBody = sMailBody & "progress. With Data Conferencing, you can share documents and presentations, and "
+     sMailBody = sMailBody & "give product demonstrations from your computer with others participating "
+     sMailBody = sMailBody & "remotely from their computers.<P><P>"
+    
+     sMailBody = sMailBody & "<u><b>TeamConnect Proper Usage:</b></u><p>"
+     sMailBody = sMailBody & "Please use TeamConnect in accordance within Ford Corporate Guidelines (ITPM, EU2. End User Computing Policy and ITPM, Access Control: Identification & Authentication Standards, Directive B-109).  TeamConnect has a <a href=http://www.dearborn.ford.com/security/faq/acricrfaq.htm?ID=node52#acr02>CIA rating of (1,1,1)</a>, operating in the Datacenter under SLA4, and supported by ADS under ADS-SLA4.  "
+     sMailBody = sMailBody & "TeamConnect policies are based on Corporate Directives and policy letters.  Please refer to <a href=https://www.lom.ford.com/launchomatic/download?objectId=09000c5180770715&contentType=pdf&rendition=pdf&contentSize=17235>Directive C-110</a>, <a href=http://www.dearborn4.ford.com/gim/gis/gis1/indexgis1.htm>Global Information Standard 1 (GIS1)</a>, and <a href=http://www.dearborn4.ford.com/gim/gis/gis2/indexgis2.htm?>Global Information Standard 2 (GIS2)</a>.<br><p>"
+     sMailBody = sMailBody & "<a href=https://www.lom.ford.com/launchomatic/download?objectId=09000c5180770715&contentType=pdf&rendition=pdf&contentSize=17235>Directive C-110</a> is Corporate Policy that classifies Company information as an asset and makes it a requirement that all employees protect the confidentiality of Company information. This includes trade secrets and other business information. The policy also includes the proper methods for handling such information. <br><p>"
+     sMailBody = sMailBody & "<a href=http://www.dearborn4.ford.com/gim/gis/gis1/indexgis1.htm>The Global Information Standard 1 (GIS1)</a> is the Company's records management standard that describes how records should be created, managed and how long they need to be retained.<br><p>"
+     sMailBody = sMailBody & "<a href=http://www.dearborn4.ford.com/gim/gis/gis2/indexgis2.htm>The Global Information Standard 2 (GIS2)</a> defines all aspects of the creation and management of Secret, Confidential, Proprietary and Public information and applies to all individuals working at Ford. The standard contains guidelines for managing Ford information including access, marking, reproduction, storage, transmittal and disposal.<br><p>"
+     sMailBody = sMailBody & "Employees of suppliers or other business partners using Ford TeamConnect to conduct Ford business are expected to adhere to the same Corporate Standards as outlined throughout these policies. <br><p>"
+     sMailBody = sMailBody & "<h2><b>TeamConnect Availability:</b></h2>"
+     sMailBody = sMailBody & "Collaborative Pattern Engineering (CPE) will make every effort to provide maximum uptime for TeamConnect sites.  In accordance with the Ford Data Center standards, CPE reserves the right to perform maintenance on any server during the Sunday maintenance window: Sundays from 12:00am - 5:00pm EST (-5 GMT).<br>"
+    
+     sMailBody = sMailBody & "<h2><B>Next Steps:</B></h2>"
+     sMailBody = sMailBody & "<P>One of the first things you can do to personalize your site is to change the "
+     sMailBody = sMailBody & "site title to something like '" & sFord_Friendly_Name & "'. To change the site title go"
+     sMailBody = sMailBody & "to the Quick Launch menu in your site, select 'Site Settings' and then click on "
+     sMailBody = sMailBody & "'Change site title and description'."
+     sMailBody = sMailBody & "<P><P><B>How to get your Instant Messaging client software:</b><p>"
+     sMailBody = sMailBody & "Please contact SPOC to request the Office Communicator SDS Push (SDS file ""OCOMM05-LF--1"").  Regional phone numbers are listed below.<p>"
+     sMailBody = sMailBody & "<B>North America Support Center:</b><br>"
+     sMailBody = sMailBody & "Internally Dialed: 74957<br>"
+     sMailBody = sMailBody & "Externally Dialed: 1-313-31-74957 or 1-888-31-74957<p><p>"
+     sMailBody = sMailBody & "<b>Ford Credit North America Support Center:</b><br>"
+     sMailBody = sMailBody & "Internally Dialed: 52262<br>"
+     sMailBody = sMailBody & "Externally Dialed: 1-313-84-52262<p><p>"
+     sMailBody = sMailBody & "<b>Ford Credit of Europe Support Center:</b><br>"
+     sMailBody = sMailBody & "Internally Dialed: 87302001<br>"
+     sMailBody = sMailBody & "Externally Dialed: +44 (0) 1277 692001<p><p>"
+     sMailBody = sMailBody & "<b>UK Support Centre:</b><br>"
+     sMailBody = sMailBody & "Internally Dialed: 87343322<br>"
+     sMailBody = sMailBody & "Externally Dialed: +44 (0) 1277 253322<p><p>"
+     sMailBody = sMailBody & "<b>German Support Centre:</b><br>"
+     sMailBody = sMailBody & "Internally Dialed: 87013322<br>"
+     sMailBody = sMailBody & "Externally Dialed: +49 (0) 221 9013322<p><p>"
+     sMailBody = sMailBody & "<b>Sweden IT-Support Centre:</b><br>"
+     sMailBody = sMailBody & "Internally Dialed: 91000<br>"
+     sMailBody = sMailBody & "Externally Dialed: +46 31 591000<p><p>"
+     sMailBody = sMailBody & "NOTE: If you are not currently supported by the SPOC Support organization; please contact your local help desk.<p>"
+      
+     ' sMailBody = sMailBody & "Please send an eMail tobgirardo@ford.com with the HostName of the computer where you wish to have Communicator installed. "
+     ' sMailBody = sMailBody & " A Workstation's hostname can be found by launching the ""Help Icon"" application located on your desktop (it is a blue circle with an ""i"" in it).  The PC's hostname can be found in the top left corner of the Info screen.  Note:  You will require this client software for Instant Messaging to work."
+     ' sMailBody = sMailBody & "Please go to <a href=http://www.tc.ford.com/RequestIM/default.aspx.>Request Communicator</a> and fill out the form with at least your CDS-ID, PC's Host Name and your "
+     ' sMailBody = sMailBody & "Ford Land Building Code.  All of this information can be found by launching the "
+     ' sMailBody = sMailBody & """Help Icon"" application located on your desktop (it is a blue circle with an ""i"" in it).  Your PC's host name can be found in the top left corner of the Info screen.  The Ford Land building number can be found further down the left side."
+     ' sMailBody = sMailBody & "  Requests are forwarded to DeskSide Services each Friday afternoon for software delivery scheduling the following week.<p>"
+    
+     sMailBody = sMailBody & "<P><P><B>With Instant Messaging you can:</B> "
+     sMailBody = sMailBody & "<P><UL><LI>Find out ahead of time if a person is online and available to receive an instant Message "
+     sMailBody = sMailBody & "<LI>Use a quick text message to verify that someone is available for a call or discussion "
+     sMailBody = sMailBody & "<LI>Exchange text messages (""chat"") with another member in real-time "
+     sMailBody = sMailBody & "<LI>Chat with multiple team members simultaneously "
+     sMailBody = sMailBody & "<LI>Leave a popup message on a member's computer screen when they are away "
+     sMailBody = sMailBody & "<LI>Reduce time spent processing your daily amount of email and voicemail</LI></UL><BR> "
+     sMailBody = sMailBody & "<P><H2><B>Training and Help</B></H2><P>Training for some of the most commonly asked questions "
+     sMailBody = sMailBody & "is available athttp://www.tc.ford.com/pages/Education.aspx <a href=http://www.tc.ford.com/pages/Education.aspx>Quick Training Videos</a>.  "
+     sMailBody = sMailBody & "It is also being provided by 3rd party vendors such as New Horizons in S.E. Michigan.  "
+     sMailBody = sMailBody & "Other materials include Computer Based Training (CBT) programs from Microsoft which can be found athttp://office.microsoft.com/en-us/assistance/CH011424541033.aspx (<a href=http://office.microsoft.com/en-us/assistance/CH011424541033.aspx>Sharepoint Documentation</a>).  "
+     sMailBody = sMailBody & "For more details, please refer to the TeamConnect Homepage athttp://www.tc.ford.com>TeamConnect Home <a href=http://www.tc.ford.com>TeamConnect Home</A>.<p>"
+     sMailBody = sMailBody & "<b>Help:  As of June 5th, 2006, First Level Help Desk Support will be provided by the SPOC organization.  Phone numbers are listed above.</b><p><p>"
+     sMailBody = sMailBody & "<P><P><B><H2>News, Notifications and Peer to Peer Support</H2></B><BR> "
+     sMailBody = sMailBody & "If you wish to receive announcments and participate in the Peer to Peer Support group please go "
+     sMailBody = sMailBody & "to the Ford List Server and subscribe to the TeamConnect List. The List Server "
+     sMailBody = sMailBody & "can be reached here:http://www.client.ford.com/cgi-bin/list-info.cgi?list=teamconnect <a href =http://www.client.ford.com/cgi-bin/list-info.cgi?list=teamconnect > TeamConnect List</A>.  "
+     sMailBody = sMailBody & "<P><P><B>Marketing Material</B><P>Would you like to let others know about the benefits of using a TeamConnect "
+     sMailBody = sMailBody & "PPS? Our PPS brochure (coming soon!) explains the main benefits in a quick, "
+     sMailBody = sMailBody & "handy format.<P><P>Regards,<P><P><P>The Collaboration Pattern Engineering Office "
+     sMailBody = sMailBody & "<P><P>P.S. If you have additional questions, please contact Bernie Girardot at "
+     sMailBody = sMailBody & "bgirardo@ford.com or by phone at (313) 62-14583<P></P></BODY></HTML>"
+     
+     Set myOlApp = CreateObject("Outlook.Application")
+     Set myItem = myOlApp.CreateItem(olMailItem)
+     Set myRecipient = myItem.Recipients.Add(Trim(sCDSID) & "@ford.com")
+     myRecipient.Resolve
+     'Set myRecipient = myItem.Recipients.Add("bgirardo@ford.com")
+     'myRecipient.Type = olCC
+     'myRecipient.Resolve
+    
+     myItem.Subject = sSubject
+     myItem.BodyFormat = olFormatHTML
+     myItem.HTMLBody = sMailBody
+     myItem.display
+     myItem.Send
+    
+     iCurrent_Row = iCurrent_Row + 1
+     sCDSID = Worksheets(1).Cells(iCurrent_Row, iCDS_Column).Value
+ Wend
+ End Sub
+ 
