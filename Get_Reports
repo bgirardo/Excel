@@ -1,0 +1,209 @@
+Public Sub Ford_Get_Reports()
+'***************************************************************************
+'
+' Written by Bernard J. Girardot
+'        for use within Ford Motor Company
+'         on July 1, 2018
+'         in VBA / Excel 2016
+'         
+' Copyright 2018, Bernard J. Girardot
+'
+' This code takes the CDSID of the targeted manager and returns all of that managers' reports.
+' 
+' Note, this macro errors if there are more than 10,000 direct reports for any one manager.
+'
+'*******************************************************************************
+    ' variables
+    Dim Con As Object
+    Dim Com As Object
+    Dim rs As Object
+    Dim sdn As String
+    Dim smail As String
+    Dim srow, scol As Integer
+    Dim sCDSID
+    Dim Managers(50000) As String ' stack of manager names
+    Dim TOPDOG As String
+    Dim CurrentCount As Integer
+    Dim sCn As String
+    Dim sFordManager As String
+    Dim sEmployeeType As String
+    Dim sfordManagerCDSID As String
+    Dim sFriendlyName As String
+    Dim icount As Integer
+    Dim sgood As Boolean
+    Dim Going As Boolean
+    Dim sFordMrRole As String
+    Dim sFordDeptCode As String
+    Dim sDisplayName As String
+    Dim sfordUidNumber As String
+    Dim RSCount As Integer
+    
+    ' connection to AD setup
+    Set Con = CreateObject("ADODB.Connection")
+    Set Com = CreateObject("ADODB.Command")
+    Con.Provider = "ADsDSOObject"  'this is the ADSI-OLEDB provider name
+    Con.Open "Active Directory Provider"
+    Set Com.ActiveConnection = Con
+    
+    ' user input
+    TOPDOG = InputBox("Top Level Manager")
+    
+    CurrentCount = 1 ' push 'em onto the stack
+    Managers(CurrentCount) = TOPDOG
+    
+    ' initialize the variables so we never carry over information
+    sFordManager = ""
+    sEmployeeType = ""
+    sCn = ""
+    sfordManagerCDSID = ""
+    sFriendlyName = ""
+   
+    ' initial setup and headers
+    srow = 3
+    scol = 1
+    Cells(1, 1).Value = "Direct Reports for: " & TOPDOG
+    Cells(2, 1).Value = "CDS-ID"
+    Cells(2, 2).Value = "MR?"
+    Cells(2, 3).Value = "Emp Type"
+    Cells(2, 4).Value = "Manager CDSID"
+    Cells(2, 5).Value = "Friendly Name"
+    Cells(2, 6).Value = "Department #"
+    sCDSID = Cells(srow, scol).Text
+    
+    ' lets start the main loop
+    While (CurrentCount > 0)   ' anyone on the stack?
+        DoEvents ' let windows do other things
+        
+        sCDSID = Managers(CurrentCount) ' pop 'em off the stack
+        CurrentCount = CurrentCount - 1
+        
+        ' go get their "reports to"
+        Com.CommandText = "<GC://dc=ford,dc=com>;(&(objectCategory=person)(objectClass=user) (fordManagerCDSID=" & sCDSID & ") ); cn, fordmanager, FordMRRole, employeeType, fordManagerCDSID, displayname, fordDeptCode, fordUidNumber, forddivision; subtree"
+        Com.Properties("Chase referrals") = &H40 ' remember - &H40 tells 'em to search all trees
+        On Error GoTo errorhandler:
+        Set rs = Com.Execute
+        On Error GoTo 0
+        
+        ' any returns?
+        
+        If (Not rs.EOF) Then
+            RSCount = 1
+            rs.MoveFirst
+            ' sgood = True
+            
+            While ((Not (rs.EOF)) And (RSCount < 950))
+                If (Not (IsNull((rs.Fields("fordUidNumber"))))) Then
+                    sfordUidNumber = rs.Fields("fordUidNumber")
+                Else
+                    sfordUidNumber = ""
+                End If
+
+                If (Not (IsNull((rs.Fields("cn"))))) Then
+                    sCn = rs.Fields("cn")
+                Else
+                    sCn = ""
+                    'sgood = False
+                End If
+                If (Not (IsNull((rs.Fields("fordMRRole"))))) Then
+                    sFordMrRole = rs.Fields("FordMRRole")
+                Else
+                    sFordMrRole = ""
+                    'sgood = False
+                End If
+                
+                If (Not (IsNull((rs.Fields("fordManager"))))) Then
+                    sFordManager = rs.Fields("fordManager")
+                Else
+                    sFordManager = ""
+                    'sgood = False
+                End If
+                
+                If ((sFordManager = "Y") Or (sFordMrRole = "Y")) Then
+                    CurrentCount = CurrentCount + 1
+                    Managers(CurrentCount) = sCn
+                End If
+                
+                
+                If (Not (IsNull((rs.Fields("EmployeeType"))))) Then
+                    sEmployeeType = rs.Fields("EmployeeType")
+                Else
+                    sEmployeeType = ""
+                    'sgood = False
+                End If
+                
+                
+                If (Not (IsNull((rs.Fields("fordManagerCDSID"))))) Then
+                    sfordManagerCDSID = rs.Fields("fordManagerCDSID")
+                Else
+                    sfordManagerCDSID = ""
+                    'sgood = False
+                End If
+                
+                
+                If (Not (IsNull((rs.Fields("displayName"))))) Then
+                    sFriendlyName = rs.Fields("displayName")
+                Else
+                    sFriendlyName = ""
+                    'sgood = False
+                End If
+                
+                If (Not (IsNull((rs.Fields("fordDeptCode"))))) Then
+                    sFordDeptCode = rs.Fields("fordDeptCode")
+                Else
+                    sFordDeptCode = ""
+                    'sgood = False
+                End If
+                
+                
+                If (Not (IsNull((rs.Fields("fordManagerCDSID"))))) Then
+                    sfordManagerCDSID = rs.Fields("fordManagerCDSID")
+                Else
+                    sfordManagerCDSID = ""
+                    'sgood = False
+                End If
+    
+                If (Not (IsNull((rs.Fields("displayname"))))) Then
+                    sDisplayName = rs.Fields("displayname")
+                Else
+                    sDisplayName = ""
+                    'sgood = False
+                End If
+    
+                'Cells(2, 1).Value = "CDS-ID"
+                'Cells(2, 2).Value = "MR?"
+                'Cells(2, 3).Value = "Emp Type"
+                'Cells(2, 4).Value = "Manager CDSID"
+                'Cells(2, 5).Value = "Display Name"
+                'Cells(2, 6).Value = "Department #"
+                
+                'If (sgood) Then
+                    If (InStrRev("AFMS", sEmployeeType)) > 0 Then
+                        Cells(srow, scol).Value = sCn & ";"                 ' column 1
+                        Cells(srow, scol + 1).Value = sFordManager          ' column 2
+                        Cells(srow, scol + 2).Value = sEmployeeType         ' column 3
+                        Cells(srow, scol + 3).Value = sfordManagerCDSID     ' column 4
+                        Cells(srow, scol + 4).Value = sDisplayName          ' column 5
+                        Cells(srow, scol + 5).Value = sFordDeptCode         ' column 6
+                        Cells(srow, scol + 6).Value = sfordUidNumber        ' column 7
+                        srow = srow + 1
+                    End If
+                'End If
+                
+                sFordManager = ""
+                sEmployeeType = ""
+                sCn = ""
+                sfordManagerCDSID = ""
+                rs.moveNext
+                RSCount = RSCount + 1
+            Wend ' while not eof
+        End If
+    Wend ' while anyone on the stack
+    MsgBox ("Completed!")
+    Exit Sub
+    
+    
+errorhandler:
+    MsgBox (Err.Number & " : " & Err.Description & " -  for " & Managers(CurrentCount))
+    CurrentCount = CurrentCount - 1
+    Resume Next
+End Sub 'done.
